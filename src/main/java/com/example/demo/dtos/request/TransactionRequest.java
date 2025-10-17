@@ -1,4 +1,4 @@
-package com.example.demo.dtos;
+package com.example.demo.dtos.request;
 
 import java.math.BigDecimal;
 

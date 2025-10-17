@@ -9,11 +9,16 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import com.example.demo.entities.Accounts;
+import com.example.demo.entities.Users;
 
 @Repository
 public interface AccountRepository extends JpaRepository<Accounts, Long> {
 
 	Optional<Accounts> findByAccountNumber(String accountNumber);
+
+	boolean existsByAccountNumber(String accountNumber);
+
+	List<Accounts> findByUsers(Users user);
 
 	@Query("SELECT a FROM Accounts a WHERE a.users.id = :userId")
 	List<Accounts> findByUserId(@Param("userId") Long userId);

@@ -13,8 +13,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.example.demo.dtos.UserRequest;
-import com.example.demo.dtos.UserResponse;
+import com.example.demo.dtos.request.UserRequest;
+import com.example.demo.dtos.response.UserResponse;
 import com.example.demo.service.impl.UserServiceImpl;
 
 import jakarta.validation.Valid;

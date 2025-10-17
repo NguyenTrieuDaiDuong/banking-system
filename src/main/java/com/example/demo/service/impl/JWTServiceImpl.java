@@ -20,12 +20,12 @@ public class JWTServiceImpl implements JWTService {
 	private Environment environment;
 
 	@Override
-	public String generateToken(String username) {
+	public String generateToken(String username, List<String> roles) {
 		String secret = environment.getProperty("app.jwt.secret");
 		long expiry = Long.parseLong(environment.getProperty("app.jwt.expiration"));
 		Date now = new Date();
 		Date expiryDate = new Date(now.getTime() + expiry);
-		return Jwts.builder().subject(username).issuedAt(now).expiration(expiryDate)
+		return Jwts.builder().subject(username).claim("roles", roles).issuedAt(now).expiration(expiryDate)
 				.signWith(Keys.hmacShaKeyFor(secret.getBytes()), Jwts.SIG.HS256).compact();
 	}
 
@@ -72,4 +72,5 @@ public class JWTServiceImpl implements JWTService {
 				.issuedAt(now).expiration(expiryDate).signWith(Keys.hmacShaKeyFor(secret.getBytes()), Jwts.SIG.HS256)
 				.compact();
 	}
+
 }

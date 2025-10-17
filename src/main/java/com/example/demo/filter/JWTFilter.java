@@ -1,6 +1,7 @@
 package com.example.demo.filter;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -38,8 +39,11 @@ public class JWTFilter extends OncePerRequestFilter {
 
 				if (jwtService.validToken(token)) {
 					String username = jwtService.getUsernameFromJWT(token);
+					List<String> roles = jwtService.extractRoles(token);
+					Collection<? extends GrantedAuthority> authorities = getAuthorities(roles);
+
 					UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
-							username, null, getAuthorities(token));
+							username, null, authorities);
 
 					SecurityContextHolder.getContext().setAuthentication(authentication);
 				}
@@ -51,9 +55,11 @@ public class JWTFilter extends OncePerRequestFilter {
 		filterChain.doFilter(request, response);
 	}
 
-	private Collection<? extends GrantedAuthority> getAuthorities(String token) {
+	private Collection<? extends GrantedAuthority> getAuthorities(List<String> roles) {
 		// Trích xuất roles từ token (nếu có)
-		List<String> roles = jwtService.extractRoles(token);
+		if (roles == null || roles.isEmpty()) {
+			return Arrays.asList(new SimpleGrantedAuthority("ROLE_USER"));
+		}
 		return roles.stream().map(SimpleGrantedAuthority::new).collect(Collectors.toList());
 	}
 }

@@ -10,8 +10,8 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import com.example.demo.dtos.UserRequest;
-import com.example.demo.dtos.UserResponse;
+import com.example.demo.dtos.request.UserRequest;
+import com.example.demo.dtos.response.UserResponse;
 import com.example.demo.entities.UserRoles;
 import com.example.demo.entities.Users;
 import com.example.demo.exception.BusinessException;
@@ -33,6 +33,7 @@ public class UserServiceImpl implements UserService {
 	private final UserRoleRepository userRoleRepository;
 	private final UserStatusRepository userStatusRepository;
 
+	@Override
 	public UserResponse createUser(UserRequest request) {
 		if (userRepository.existsByUsername(request.getUsername())) {
 			throw new BusinessException("username đã tồn tại", "USERNAME_EXISTS");

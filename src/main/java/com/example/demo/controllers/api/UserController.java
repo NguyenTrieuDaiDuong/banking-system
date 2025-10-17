@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.example.demo.dtos.UserRequest;
 import com.example.demo.dtos.UserResponse;
-import com.example.demo.service.UserService;
+import com.example.demo.service.impl.UserServiceImpl;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -24,31 +24,31 @@ import lombok.RequiredArgsConstructor;
 @RequestMapping("/api/users")
 @RequiredArgsConstructor
 public class UserController {
-	private final UserService userService;
+	private final UserServiceImpl userServiceImpl;
 
 	@PostMapping("")
 	public ResponseEntity<UserResponse> createUser(@Valid @RequestBody UserRequest userRequest) {
 
-		UserResponse response = userService.createUser(userRequest);
+		UserResponse response = userServiceImpl.createUser(userRequest);
 		return ResponseEntity.status(HttpStatus.CREATED).body(response);
 	}
 
 	@GetMapping
 	public ResponseEntity<List<UserResponse>> getAllUsers() {
-		List<UserResponse> users = userService.getAllUsers();
+		List<UserResponse> users = userServiceImpl.getAllUsers();
 		return ResponseEntity.ok(users);
 	}
 
 	@PutMapping("/{userId}/role")
 	public ResponseEntity<UserResponse> changeUserRole(@PathVariable("userId") Long userId,
 			@RequestParam String roleCode) {
-		UserResponse response = userService.changeUserRole(userId, roleCode);
+		UserResponse response = userServiceImpl.changeUserRole(userId, roleCode);
 		return ResponseEntity.ok(response);
 	}
 
 	@GetMapping("/by-role/{roleCode}")
 	public ResponseEntity<List<UserResponse>> getUsersByRole(@PathVariable("roleCode") String roleCode) {
-		List<UserResponse> users = userService.getUsersByRole(roleCode);
+		List<UserResponse> users = userServiceImpl.getUsersByRole(roleCode);
 		return ResponseEntity.ok(users);
 	}
 }

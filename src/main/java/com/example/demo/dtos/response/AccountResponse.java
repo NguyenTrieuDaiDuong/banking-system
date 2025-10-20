@@ -19,4 +19,5 @@ public class AccountResponse {
 	private Date updatedAt;
 	private String userFullName;
 	private Long userId;
+
 }

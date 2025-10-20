@@ -44,7 +44,8 @@ public class SecurityConfig {
 				.authorizeHttpRequests(auth -> auth
 						.requestMatchers("/api/auth/**", "/api/auth/check-username/**", "/api/auth/check-email/**",
 								"/error", "/api/users/**")
-						.permitAll().requestMatchers("/api/accounts/***").authenticated().anyRequest().authenticated())
+						.permitAll().requestMatchers("/api/accounts/***").authenticated()
+						.requestMatchers("/api/transfers/**").authenticated().anyRequest().authenticated())
 				.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 				.addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class) // THÊM DÒNG NÀY
 				.build();

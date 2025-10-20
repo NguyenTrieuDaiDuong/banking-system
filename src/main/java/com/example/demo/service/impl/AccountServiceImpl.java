@@ -80,12 +80,23 @@ public class AccountServiceImpl implements AccountService {
 		AccountResponse response = new AccountResponse();
 		response.setId(account.getId());
 		response.setAccountNumber(account.getAccountNumber());
-		response.setAccountType(account.getAccountTypes().getTypeName());
-		response.setStatus(account.getAccountStatuses().getStatusName());
+		if (account.getAccountTypes() != null) {
+			response.setAccountType(account.getAccountTypes().getTypeName());
+			response.setAccountTypeId(account.getAccountTypes().getId());
+		}
+		if (account.getAccountStatuses() != null) {
+			response.setStatus(account.getAccountStatuses().getStatusName());
+			response.setStatusId(account.getAccountStatuses().getId());
+		}
 		response.setBalance(account.getBalance());
 		response.setCurrency(account.getCurrency());
 		response.setCreatedAt(account.getCreatedAt());
-		response.setUserFullName(account.getUsers().getFullName());
+		response.setUpdatedAt(account.getUpdatedAt());
+		if (account.getUsers() != null) {
+			response.setUserFullName(account.getUsers().getFullName());
+			response.setUserId(account.getUsers().getId());
+		}
+
 		return response;
 	}
 

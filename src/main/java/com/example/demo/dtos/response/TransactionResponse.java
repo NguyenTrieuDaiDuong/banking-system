@@ -3,6 +3,9 @@ package com.example.demo.dtos.response;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
+import lombok.Data;
+
+@Data
 public class TransactionResponse {
 	private String transactionCode;
 	private String typeName;

@@ -12,7 +12,7 @@ import com.example.demo.entities.Users;
 @Repository
 public interface UserRepository extends JpaRepository<Users, Long> {
 
-	Users findByUsername(String username);
+	Optional<Users> findByUsername(String username);
 
 	Optional<Users> findByEmail(String email);
 

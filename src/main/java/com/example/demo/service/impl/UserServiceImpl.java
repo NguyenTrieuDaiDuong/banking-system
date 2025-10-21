@@ -2,6 +2,8 @@ package com.example.demo.service.impl;
 
 import java.util.List;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
@@ -15,6 +17,7 @@ import com.example.demo.dtos.response.UserResponse;
 import com.example.demo.entities.UserRoles;
 import com.example.demo.entities.Users;
 import com.example.demo.exception.BusinessException;
+import com.example.demo.exception.ErrorCodes;
 import com.example.demo.repositories.UserRepository;
 import com.example.demo.repositories.UserRoleRepository;
 import com.example.demo.repositories.UserStatusRepository;
@@ -24,7 +27,6 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
 @Service
-@Transactional
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
 
@@ -33,16 +35,20 @@ public class UserServiceImpl implements UserService {
 	private final UserRoleRepository userRoleRepository;
 	private final UserStatusRepository userStatusRepository;
 
+	@Transactional
 	@Override
 	public UserResponse createUser(UserRequest request) {
+
+		validateUserRequest(request);
+
 		if (userRepository.existsByUsername(request.getUsername())) {
-			throw new BusinessException("username đã tồn tại", "USERNAME_EXISTS");
+			throw new BusinessException(ErrorCodes.AUTH_USER_EXISTS, "USERNAME_EXISTS");
 		}
 		if (userRepository.existsByEmail(request.getEmail())) {
-			throw new BusinessException("email đã tồn tại", "EMAIL_EXISTS");
+			throw new BusinessException(ErrorCodes.USR_INVALID_DATA, "EMAIL_EXISTS");
 		}
 		if (request.getIdentityCard() != null && userRepository.existsByIdentityCard(request.getIdentityCard())) {
-			throw new BusinessException("CMMD/CCCD đã tồn tại", "IDENTITY_CARD_EXIST");
+			throw new BusinessException(ErrorCodes.USR_INVALID_DATA, "IDENTITY_CARD_EXIST");
 		}
 
 		Users user = new Users();
@@ -56,41 +62,51 @@ public class UserServiceImpl implements UserService {
 		user.setAddress(request.getAddress());
 
 		UserRoles userRole = userRoleRepository.findByRoleCode("USER")
-				.orElseThrow(() -> new BusinessException("Role User không tồn tại", "ROLE_NOT_FOUND"));
-
+				.orElseThrow(() -> new BusinessException(ErrorCodes.AUTH_ACCESS_DENIED, "ROLE_NOT_FOUND"));
 		user.setUserRoles(userRole);
 
 		user.setUserStatuses(userStatusRepository.findByStatusCode("ACTIVE")
-				.orElseThrow(() -> new BusinessException("Status ACTIVE không tồn tại")));
-
+				.orElseThrow(() -> new BusinessException(ErrorCodes.USR_INVALID_DATA, "Status ACTIVE không tồn tại")));
 		Users saveUser = userRepository.save(user);
 
 		return mapToUserResponse(saveUser);
 
 	}
 
-	public UserResponse changeUserRole(Long userId, String roleCode) {
+	@Transactional
+	public UserResponse changeUserRole(Long userId, String currentUsername, String roleCode) {
+		Users currentUser = userRepository.findByUsername(currentUsername)
+				.orElseThrow(() -> new BusinessException(ErrorCodes.USR_NOT_FOUND, ""));
+		if (!"ADMIN".equalsIgnoreCase(currentUser.getUserRoles().getRoleCode())) {
+			throw new BusinessException(ErrorCodes.AUTH_ACCESS_DENIED, "Only ADMIN can change role");
+		}
+		if (userId.equals(currentUser.getId())) {
+			throw new BusinessException(ErrorCodes.AUTH_ACCESS_DENIED, "Cannot change one's own role");
+		}
 		Users user = userRepository.findById(userId)
-				.orElseThrow(() -> new BusinessException("User không tồn tại", "USER_NOT_FOUND"));
-
+				.orElseThrow(() -> new BusinessException(ErrorCodes.USR_NOT_FOUND, "USER_NOT_FOUND"));
 		UserRoles newRoles = userRoleRepository.findByRoleCode(roleCode)
-				.orElseThrow(() -> new BusinessException("Role không tồn tại", "ROLE_NOT_FOUND"));
+				.orElseThrow(() -> new BusinessException(ErrorCodes.AUTH_ACCESS_DENIED, "ROLE_NOT_FOUND"));
 
 		user.setUserRoles(newRoles);
+
 		Users updatedUser = userRepository.save(user);
-
 		return mapToUserResponse(updatedUser);
-
 	}
 
+	@Override
 	public List<UserResponse> getUsersByRole(String roleCode) {
+		if (roleCode == null || roleCode.trim().isEmpty()) {
+			throw new BusinessException(ErrorCodes.USR_INVALID_DATA, "Role code required");
+		}
 		List<Users> users = userRepository.getByUserRoles_RoleCode(roleCode);
 		return users.stream().map(this::mapToUserResponse).toList();
 	}
 
-	public List<UserResponse> getAllUsers() {
-		List<Users> users = userRepository.findAllWithRelations();
-		return users.stream().map(this::mapToUserResponse).toList();
+	@Override
+	public Page<UserResponse> getAllUsers(Pageable pageable) {
+		Page<Users> userPage = userRepository.findAll(pageable);
+		return userPage.map(this::mapToUserResponse);
 	}
 
 	private UserResponse mapToUserResponse(Users user) {
@@ -99,9 +115,7 @@ public class UserServiceImpl implements UserService {
 		response.setId(user.getId());
 		response.setEmail(user.getEmail());
 		response.setUsername(user.getUsername());
-		;
 		response.setFullName(user.getFullName());
-		;
 		response.setPhone(user.getPhone());
 
 		if (user.getUserRoles() != null) {
@@ -117,22 +131,25 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
-	public Users findByUsername(String username) {
-		// TODO Auto-generated method stub
-		return userRepository.findByUsername(username);
-	}
-
-	@Override
 	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-		Users user = findByUsername(username);
-		if (user == null) {
-			throw new UsernameNotFoundException("Username not found: " + username);
-		}
-		List<GrantedAuthority> authorities = List.of(new SimpleGrantedAuthority(user.getUserRoles().getRoleName()));
+		Users user = userRepository.findByUsername(username)
+				.orElseThrow(() -> new UsernameNotFoundException("User not found :" + username));
 
-		System.out.println("Found user: " + user.getUsername()); // Debug
-		System.out.println("Password in DB: " + user.getPassword()); // Debug
-		return new User(user.getUsername(), user.getPassword(), authorities);
+		List<GrantedAuthority> authorities = List
+				.of(new SimpleGrantedAuthority("ROLE_" + user.getUserRoles().getRoleCode()));
+
+		return new User(user.getUsername(), user.getPassword(), true, true, true, true, authorities);
 	}
 
+	private void validateUserRequest(UserRequest request) {
+		if (request.getUsername() == null || request.getUsername().trim().isEmpty()) {
+			throw new BusinessException(ErrorCodes.USR_INVALID_DATA, "Username required");
+		}
+		if (request.getEmail() == null || !request.getEmail().contains("@")) {
+			throw new BusinessException(ErrorCodes.USR_INVALID_DATA, "Invalid Email");
+		}
+		if (request.getPassword() == null || request.getPassword().length() < 6) {
+			throw new BusinessException(ErrorCodes.USR_INVALID_DATA, "Password min 6 chars");
+		}
+	}
 }

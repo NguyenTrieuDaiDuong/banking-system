@@ -5,7 +5,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.example.demo.dtos.response.AccountResponse;
@@ -13,34 +12,46 @@ import com.example.demo.entities.AccountStatuses;
 import com.example.demo.entities.AccountTypes;
 import com.example.demo.entities.Accounts;
 import com.example.demo.entities.Users;
+import com.example.demo.exception.BusinessException;
+import com.example.demo.exception.ErrorCodes;
 import com.example.demo.repositories.AccountRepository;
 import com.example.demo.repositories.AccountStatusRepository;
 import com.example.demo.repositories.AccountTypeRepository;
+import com.example.demo.repositories.UserRepository;
 import com.example.demo.service.AccountService;
-import com.example.demo.service.UserService;
+
+import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
 
 @Service
+@RequiredArgsConstructor
 public class AccountServiceImpl implements AccountService {
 
-	@Autowired
-	private AccountRepository accountRepository;
+	private final AccountRepository accountRepository;
 
-	@Autowired
-	private AccountTypeRepository accountTypeRepository;
+	private final AccountTypeRepository accountTypeRepository;
 
-	@Autowired
-	private AccountStatusRepository accountStatusRepository;
+	private final AccountStatusRepository accountStatusRepository;
 
-	@Autowired
-	private UserService userService;
+	private final UserRepository userRepository;
 
+	private void validateUsername(String username) {
+		if (username == null || username.trim().isEmpty()) {
+			throw new BusinessException(ErrorCodes.USR_INVALID_DATA, "Username required");
+		}
+	}
+
+	@Transactional
 	@Override
 	public AccountResponse createSavingsAccount(String username) {
-		Users user = userService.findByUsername(username);
+		validateUsername(username);
+
+		Users user = userRepository.findByUsername(username)
+				.orElseThrow(() -> new BusinessException(ErrorCodes.USR_NOT_FOUND, "User not found"));
 		AccountTypes savingsType = accountTypeRepository.findByTypeCode("SAVINGS")
-				.orElseThrow(() -> new RuntimeException("Savings account type not found"));
+				.orElseThrow(() -> new BusinessException(ErrorCodes.ACC_NOT_FOUND, "Savings account type not found"));
 		AccountStatuses activeStatus = accountStatusRepository.findByStatusCode("ACTIVE")
-				.orElseThrow(() -> new RuntimeException("Active status not found"));
+				.orElseThrow(() -> new BusinessException(ErrorCodes.ACC_NOT_FOUND, "Active status not found"));
 
 		String accountNumber = generateAccountNumber();
 
@@ -55,28 +66,32 @@ public class AccountServiceImpl implements AccountService {
 		account.setUpdatedAt(new Date());
 
 		Accounts savedAccount = accountRepository.save(account);
-		return maptoResponse(savedAccount);
+		return mapToResponse(savedAccount);
 	}
 
 	@Override
-	public List<AccountResponse> getUserAccount(String username) {
-		Users user = userService.findByUsername(username);
-		return accountRepository.findByUsers(user).stream().map(this::maptoResponse).collect(Collectors.toList());
+	public List<AccountResponse> getUserAccounts(String username) {
+		validateUsername(username);
+		Users user = userRepository.findByUsername(username)
+				.orElseThrow(() -> new BusinessException(ErrorCodes.USR_NOT_FOUND, "User not found"));
+		return accountRepository.findByUsers(user).stream().map(this::mapToResponse).collect(Collectors.toList());
 	}
 
 	@Override
 	public AccountResponse getAccountDetails(String accountNumber, String username) {
-		Users user = userService.findByUsername(username);
+		validateUsername(username);
+		Users user = userRepository.findByUsername(username)
+				.orElseThrow(() -> new BusinessException(ErrorCodes.USR_NOT_FOUND, "User not found"));
 		Accounts account = accountRepository.findByAccountNumber(accountNumber)
-				.orElseThrow(() -> new RuntimeException("Account not found"));
+				.orElseThrow(() -> new BusinessException(ErrorCodes.ACC_NOT_FOUND, "Account not found"));
 
 		if (!account.getUsers().getId().equals(user.getId())) {
-			throw new RuntimeException("Access Denied");
+			throw new BusinessException(ErrorCodes.ACC_ACCESS_DENIED, "Access Denied");
 		}
-		return maptoResponse(account);
+		return mapToResponse(account);
 	}
 
-	private AccountResponse maptoResponse(Accounts account) {
+	private AccountResponse mapToResponse(Accounts account) {
 		AccountResponse response = new AccountResponse();
 		response.setId(account.getId());
 		response.setAccountNumber(account.getAccountNumber());
@@ -101,11 +116,13 @@ public class AccountServiceImpl implements AccountService {
 	}
 
 	private String generateAccountNumber() {
-		String accountNumber;
-		do {
-			long randomNum = (long) (Math.random() * 9_000_000_000L) + 1_000_000_000;
-			accountNumber = String.valueOf(randomNum);
-		} while (accountRepository.existsByAccountNumber(accountNumber));
-		return accountNumber;
+		int maxRetries = 10;
+		for (int i = 0; i < maxRetries; i++) {
+			String accountNumber = String.format("ACC%010d", (long) (Math.random() * 900_000_000L));
+			if (!accountRepository.existsByAccountNumber(accountNumber)) {
+				return accountNumber;
+			}
+		}
+		throw new BusinessException(ErrorCodes.USR_INVALID_DATA, "Cannot generate unique account number ");
 	}
 }

@@ -28,4 +28,19 @@ public class ErrorResponse {
 		this.message = message;
 		this.details = details;
 	}
+
+	public ErrorResponse(String errorCode, String message, String path) {
+		this.timestamp = LocalDateTime.now();
+		this.errorCode = errorCode;
+		this.message = message;
+		this.path = path;
+	}
+
+	public ErrorResponse(String errorCode, String message, List<String> details, String path) {
+		this.timestamp = LocalDateTime.now();
+		this.errorCode = errorCode;
+		this.message = message;
+		this.details = details;
+		this.path = path;
+	}
 }

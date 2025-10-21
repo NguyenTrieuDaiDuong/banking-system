@@ -27,8 +27,7 @@ public interface AccountRepository extends JpaRepository<Accounts, Long> {
 	List<Accounts> findByUserIdAndStatusCode(@Param("userId") Long userId, @Param("statusCode") String statusCode);
 
 	@Query("SELECT a FROM Accounts a WHERE a.users.id = :userId AND a.accountTypes.typeCode = :typeCode")
-
-	List<Accounts> findByUserIdByTypeCode(@Param("userId") Long userId, @Param("typeCode") String typeCode);
+	List<Accounts> findByUserIdAndTypeCode(@Param("userId") Long userId, @Param("typeCode") String typeCode);
 
 	@Query("SELECT a FROM Accounts a WHERE a.users.username = :username")
 	List<Accounts> findByUsers_Username(@Param("username") String username);

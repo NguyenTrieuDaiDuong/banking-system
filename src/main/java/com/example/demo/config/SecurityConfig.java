@@ -2,7 +2,6 @@ package com.example.demo.config;
 
 import java.util.Arrays;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -20,12 +19,14 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import com.example.demo.filter.JWTFilter;
 
+import lombok.RequiredArgsConstructor;
+
 @Configuration
 @EnableWebSecurity
+@RequiredArgsConstructor
 public class SecurityConfig {
 
-	@Autowired
-	private JWTFilter jwtFilter;
+	private final JWTFilter jwtFilter;
 
 	@Bean
 	public PasswordEncoder passwordEncoder() {
@@ -42,13 +43,17 @@ public class SecurityConfig {
 	public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 		return http.cors(cors -> cors.configurationSource(corsConfigurationSource())).csrf(csrf -> csrf.disable())
 				.authorizeHttpRequests(auth -> auth
+						// PUBLIC ENDPOINTS
 						.requestMatchers("/api/auth/**", "/api/auth/check-username/**", "/api/auth/check-email/**",
-								"/error", "/api/users/**")
-						.permitAll().requestMatchers("/api/accounts/***").authenticated()
-						.requestMatchers("/api/transfers/**").authenticated().anyRequest().authenticated())
+								"/error", "/swagger-ui/**", "/v3/api-docs/**")
+						.permitAll()
+						// USER ENDPOINTS
+						.requestMatchers("/api/users").permitAll().requestMatchers("/api/transactions/**")
+						.authenticated().requestMatchers("/api/accounts/**", "/api/transfers/**").authenticated()
+						// ADMIN ONLY
+						.requestMatchers("/api/users/{id}/role").hasRole("ADMIN").anyRequest().authenticated())
 				.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-				.addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class) // THÊM DÒNG NÀY
-				.build();
+				.addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class).build();
 	}
 
 	@Bean

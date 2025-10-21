@@ -7,7 +7,7 @@ import com.example.demo.dtos.response.AccountResponse;
 public interface AccountService {
 	AccountResponse createSavingsAccount(String username);
 
-	List<AccountResponse> getUserAccount(String username);
+	List<AccountResponse> getUserAccounts(String username);
 
 	AccountResponse getAccountDetails(String accountNumber, String username);
 }

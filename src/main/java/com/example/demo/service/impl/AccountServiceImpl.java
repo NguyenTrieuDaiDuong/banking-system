@@ -1,7 +1,7 @@
 package com.example.demo.service.impl;
 
 import java.math.BigDecimal;
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -62,8 +62,8 @@ public class AccountServiceImpl implements AccountService {
 		account.setUsers(user);
 		account.setBalance(BigDecimal.ZERO);
 		account.setCurrency("VND");
-		account.setCreatedAt(new Date());
-		account.setUpdatedAt(new Date());
+		account.setCreatedAt(LocalDateTime.now());
+		account.setUpdatedAt(LocalDateTime.now());
 
 		Accounts savedAccount = accountRepository.save(account);
 		return mapToResponse(savedAccount);

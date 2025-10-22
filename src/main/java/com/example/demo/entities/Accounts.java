@@ -3,7 +3,7 @@ package com.example.demo.entities;
 import static jakarta.persistence.GenerationType.IDENTITY;
 
 import java.math.BigDecimal;
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -34,8 +34,8 @@ public class Accounts implements java.io.Serializable {
 	private String accountNumber;
 	private BigDecimal balance;
 	private String currency;
-	private Date createdAt;
-	private Date updatedAt;
+	private LocalDateTime createdAt;
+	private LocalDateTime updatedAt;
 	private Set<Transactions> transactionsesForFromAccountId = new HashSet<Transactions>(0);
 	private Set<Transactions> transactionsesForToAccountId = new HashSet<Transactions>(0);
 
@@ -43,7 +43,7 @@ public class Accounts implements java.io.Serializable {
 	}
 
 	public Accounts(AccountStatuses accountStatuses, AccountTypes accountTypes, Users users, String accountNumber,
-			Date createdAt, Date updatedAt) {
+			LocalDateTime createdAt, LocalDateTime updatedAt) {
 		this.accountStatuses = accountStatuses;
 		this.accountTypes = accountTypes;
 		this.users = users;
@@ -53,7 +53,7 @@ public class Accounts implements java.io.Serializable {
 	}
 
 	public Accounts(AccountStatuses accountStatuses, AccountTypes accountTypes, Users users, String accountNumber,
-			BigDecimal balance, String currency, Date createdAt, Date updatedAt,
+			BigDecimal balance, String currency, LocalDateTime createdAt, LocalDateTime updatedAt,
 			Set<Transactions> transactionsesForFromAccountId, Set<Transactions> transactionsesForToAccountId) {
 		this.accountStatuses = accountStatuses;
 		this.accountTypes = accountTypes;
@@ -138,21 +138,21 @@ public class Accounts implements java.io.Serializable {
 
 	@Temporal(TemporalType.TIMESTAMP)
 	@Column(name = "created_at", nullable = false, length = 19)
-	public Date getCreatedAt() {
+	public LocalDateTime getCreatedAt() {
 		return this.createdAt;
 	}
 
-	public void setCreatedAt(Date createdAt) {
+	public void setCreatedAt(LocalDateTime createdAt) {
 		this.createdAt = createdAt;
 	}
 
 	@Temporal(TemporalType.TIMESTAMP)
 	@Column(name = "updated_at", nullable = false, length = 19)
-	public Date getUpdatedAt() {
+	public LocalDateTime getUpdatedAt() {
 		return this.updatedAt;
 	}
 
-	public void setUpdatedAt(Date updatedAt) {
+	public void setUpdatedAt(LocalDateTime updatedAt) {
 		this.updatedAt = updatedAt;
 	}
 

@@ -1,7 +1,7 @@
 package com.example.demo.dtos.response;
 
 import java.math.BigDecimal;
-import java.util.Date;
+import java.time.LocalDateTime;
 
 import lombok.Data;
 
@@ -13,7 +13,7 @@ public class TransferResponse {
 	private BigDecimal amount;
 	private String description;
 	private String status;
-	private Date transactionDate;
+	private LocalDateTime transactionDate;
 	private String referenceNumber;
 	private BigDecimal newBalance;
 	private String beneficiaryName;

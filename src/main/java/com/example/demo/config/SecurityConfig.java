@@ -50,6 +50,7 @@ public class SecurityConfig {
 						// USER ENDPOINTS
 						.requestMatchers("/api/users").permitAll().requestMatchers("/api/transactions/**")
 						.authenticated().requestMatchers("/api/accounts/**", "/api/transfers/**").authenticated()
+						.requestMatchers("/api/deposits/**").authenticated()
 						// ADMIN ONLY
 						.requestMatchers("/api/users/{id}/role").hasRole("ADMIN").anyRequest().authenticated())
 				.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))

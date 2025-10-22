@@ -1,7 +1,7 @@
 package com.example.demo.service.impl;
 
 import java.math.BigDecimal;
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -43,9 +43,10 @@ public class TransferServiceImpl implements TransferService {
 
 		if (request.getFromAccountNumber() == null || request.getFromAccountNumber().isEmpty()) {
 			List<Accounts> userAccounts = accountRepository.findByUsers_Username(username);
-			if (userAccounts.isEmpty()) {
-				throw new BusinessException(ErrorCodes.ACC_NOT_FOUND, "User has no acounts");
+			if (!userAccounts.isEmpty()) {
+				throw new BusinessException(ErrorCodes.ACC_NOT_FOUND, "Account not found");
 			}
+
 			Accounts primaryAccount = findPrimaryAccount(userAccounts);
 			request.setFromAccountNumber(primaryAccount.getAccountNumber());
 		}
@@ -70,12 +71,12 @@ public class TransferServiceImpl implements TransferService {
 		// trừ tiền tài khoản chính (tài khoản chuyển tiền)
 
 		fromAccount.setBalance(fromAccount.getBalance().subtract(request.getAmount()));
-		fromAccount.setUpdatedAt(new Date());
+		fromAccount.setUpdatedAt(LocalDateTime.now());
 		accountRepository.save(fromAccount);
 		// cộng tiền tài khoản được chuyển
 
 		toAccount.setBalance(toAccount.getBalance().add(request.getAmount()));
-		toAccount.setUpdatedAt(new Date());
+		toAccount.setUpdatedAt(LocalDateTime.now());
 		accountRepository.save(toAccount);
 		// tạo bản lưu giao dịch
 
@@ -89,7 +90,7 @@ public class TransferServiceImpl implements TransferService {
 		transaction.setDescription(request.getDescription());
 		transaction.setBeneficiaryAccount(toAccount.getAccountNumber());
 		transaction.setBeneficiaryName(toAccount.getUsers().getFullName());
-		transaction.setCreatedAt(new Date());
+		transaction.setCreatedAt(LocalDateTime.now());
 		Transactions savedTransaction = transactionRepository.save(transaction);
 
 		return createTransferResponse(savedTransaction, fromAccount.getBalance());
@@ -103,7 +104,7 @@ public class TransferServiceImpl implements TransferService {
 		Accounts fromAccount = accountRepository.findByAccountNumber(request.getFromAccountNumber())
 				.orElseThrow(() -> new BusinessException(ErrorCodes.ACC_NOT_FOUND, "From account not found"));
 		if (!fromAccount.getUsers().getUsername().equals(username)) {
-			throw new BusinessException(ErrorCodes.ACC_UNAUTHORIZED, "You don't own the source account");
+			throw new BusinessException(ErrorCodes.ACC_ACCESS_DENIED, "You don't own the source account");
 		}
 		// kiểm tra tiền ( tiền > 0)
 		if (request.getAmount().compareTo(BigDecimal.ZERO) <= 0) {

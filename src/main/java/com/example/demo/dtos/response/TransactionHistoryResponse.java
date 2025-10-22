@@ -1,14 +1,14 @@
 package com.example.demo.dtos.response;
 
 import java.math.BigDecimal;
-import java.util.Date;
+import java.time.LocalDateTime;
 
 import lombok.Data;
 
 @Data
 public class TransactionHistoryResponse {
 	private String transactionCode;
-	private Date transactionDate;
+	private LocalDateTime transactionDate;
 	private String status;
 	private BigDecimal amount;
 	private String description;

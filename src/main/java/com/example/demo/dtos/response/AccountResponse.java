@@ -1,7 +1,7 @@
 package com.example.demo.dtos.response;
 
 import java.math.BigDecimal;
-import java.util.Date;
+import java.time.LocalDateTime;
 
 import lombok.Data;
 
@@ -15,8 +15,8 @@ public class AccountResponse {
 	private String currency;
 	private String status;
 	private Integer statusId;
-	private Date createdAt;
-	private Date updatedAt;
+	private LocalDateTime createdAt;
+	private LocalDateTime updatedAt;
 	private String userFullName;
 	private Long userId;
 

@@ -43,6 +43,11 @@ public class ErrorCodes {
 	public static final String INVALID_REQUEST = "BA_VAL_002";
 	public static final String INVALID_AMOUNT = "BA_VAL_003";
 
+	// ===== DEPOSIT ERRORS =====
+	public static final String DEPOSIT_LIMIT_EXCEEDED = "BA_DPT_001";
+	public static final String INVALID_PAYMENT_METHOD = "BA_DPT_002";
+	public static final String ACCOUNT_NOT_ACTIVE = "BA_DPT_003";
+
 	// ===== BUSINESS RULE ERRORS =====
 	public static final String BUSINESS_RULE_VIOLATION = "BA_BUS_001";
 

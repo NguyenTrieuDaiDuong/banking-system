@@ -5,7 +5,7 @@ package com.example.demo.entities;// default package
 import static jakarta.persistence.GenerationType.IDENTITY;
 
 import java.math.BigDecimal;
-import java.util.Date;
+import java.time.LocalDateTime;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -15,8 +15,6 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-import jakarta.persistence.Temporal;
-import jakarta.persistence.TemporalType;
 import jakarta.persistence.UniqueConstraint;
 
 /**
@@ -36,13 +34,13 @@ public class Transactions implements java.io.Serializable {
 	private String description;
 	private String beneficiaryName;
 	private String beneficiaryAccount;
-	private Date createdAt;
+	private LocalDateTime createdAt;
 
 	public Transactions() {
 	}
 
 	public Transactions(TransactionStatuses transactionStatuses, TransactionTypes transactionTypes,
-			String transactionCode, BigDecimal amount, Date createdAt) {
+			String transactionCode, BigDecimal amount, LocalDateTime createdAt) {
 		this.transactionStatuses = transactionStatuses;
 		this.transactionTypes = transactionTypes;
 		this.transactionCode = transactionCode;
@@ -52,7 +50,8 @@ public class Transactions implements java.io.Serializable {
 
 	public Transactions(Accounts accountsByFromAccountId, Accounts accountsByToAccountId,
 			TransactionStatuses transactionStatuses, TransactionTypes transactionTypes, String transactionCode,
-			BigDecimal amount, String description, String beneficiaryName, String beneficiaryAccount, Date createdAt) {
+			BigDecimal amount, String description, String beneficiaryName, String beneficiaryAccount,
+			LocalDateTime createdAt) {
 		this.accountsByFromAccountId = accountsByFromAccountId;
 		this.accountsByToAccountId = accountsByToAccountId;
 		this.transactionStatuses = transactionStatuses;
@@ -162,13 +161,12 @@ public class Transactions implements java.io.Serializable {
 		this.beneficiaryAccount = beneficiaryAccount;
 	}
 
-	@Temporal(TemporalType.TIMESTAMP)
 	@Column(name = "created_at", nullable = false, length = 19)
-	public Date getCreatedAt() {
+	public LocalDateTime getCreatedAt() {
 		return this.createdAt;
 	}
 
-	public void setCreatedAt(Date createdAt) {
+	public void setCreatedAt(LocalDateTime createdAt) {
 		this.createdAt = createdAt;
 	}
 

@@ -38,7 +38,7 @@ public class TransferController {
 		try {
 			String username = authentication.getName();
 			boolean isValid = transferService.validateTransfer(request, username);
-			return ResponseEntity.ok().body("Transfer validation successful");
+			return ResponseEntity.ok(isValid);
 		} catch (Exception e) {
 			// TODO: handle exception
 			return ResponseEntity.badRequest().body(e.getMessage());

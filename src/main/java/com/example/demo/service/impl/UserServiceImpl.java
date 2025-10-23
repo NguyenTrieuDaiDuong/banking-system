@@ -1,5 +1,6 @@
 package com.example.demo.service.impl;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.data.domain.Page;
@@ -60,7 +61,7 @@ public class UserServiceImpl implements UserService {
 		user.setDateOfBirth(request.getDateOfBirth());
 		user.setIdentityCard(request.getIdentityCard());
 		user.setAddress(request.getAddress());
-
+		user.setCreatedAt(LocalDateTime.now());
 		UserRoles userRole = userRoleRepository.findByRoleCode("USER")
 				.orElseThrow(() -> new BusinessException(ErrorCodes.AUTH_ACCESS_DENIED, "ROLE_NOT_FOUND"));
 		user.setUserRoles(userRole);

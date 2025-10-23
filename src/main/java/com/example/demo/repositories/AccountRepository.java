@@ -31,4 +31,5 @@ public interface AccountRepository extends JpaRepository<Accounts, Long> {
 
 	@Query("SELECT a FROM Accounts a WHERE a.users.username = :username")
 	List<Accounts> findByUsers_Username(@Param("username") String username);
+
 }

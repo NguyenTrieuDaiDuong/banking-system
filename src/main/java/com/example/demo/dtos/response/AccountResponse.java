@@ -19,5 +19,4 @@ public class AccountResponse {
 	private LocalDateTime updatedAt;
 	private String userFullName;
 	private Long userId;
-
 }

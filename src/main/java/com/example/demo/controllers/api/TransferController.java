@@ -13,9 +13,11 @@ import com.example.demo.dtos.response.TransferResponse;
 import com.example.demo.service.TransferService;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @RestController
 @RequestMapping("/api/transfers")
+@Slf4j
 @RequiredArgsConstructor
 public class TransferController {
 

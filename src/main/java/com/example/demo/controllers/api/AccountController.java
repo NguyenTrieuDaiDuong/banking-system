@@ -14,8 +14,11 @@ import org.springframework.web.bind.annotation.RestController;
 import com.example.demo.dtos.response.AccountResponse;
 import com.example.demo.service.AccountService;
 
+import lombok.extern.slf4j.Slf4j;
+
 @RestController
 @RequestMapping("/api/accounts")
+@Slf4j
 public class AccountController {
 	@Autowired
 	private AccountService accountService;
@@ -35,10 +38,26 @@ public class AccountController {
 	}
 
 	@GetMapping("/{accountNumber}")
-	public ResponseEntity<AccountResponse> getAccountDetails(@PathVariable("accountNumber") String accountNumber,
+	public ResponseEntity<AccountResponse> getAccountDetails(@PathVariable String accountNumber,
 			Authentication authentication) {
 		String username = authentication.getName();
 		AccountResponse response = accountService.getAccountDetails(accountNumber, username);
+		return ResponseEntity.ok(response);
+	}
+
+	@PostMapping("/{accountNumber}/lock")
+	public ResponseEntity<AccountResponse> lockAccount(@PathVariable String accountNumber,
+			Authentication authentication) {
+		String username = authentication.getName();
+		AccountResponse response = accountService.lockAccount(accountNumber, username);
+		return ResponseEntity.ok(response);
+	}
+
+	@PostMapping("/{accountNumber}/unlock")
+	public ResponseEntity<AccountResponse> unlockAccount(@PathVariable String accountNumber,
+			Authentication authentication) {
+		String username = authentication.getName();
+		AccountResponse response = accountService.unlockAccount(accountNumber, username);
 		return ResponseEntity.ok(response);
 	}
 }

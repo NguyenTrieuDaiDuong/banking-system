@@ -10,4 +10,8 @@ public interface AccountService {
 	List<AccountResponse> getUserAccounts(String username);
 
 	AccountResponse getAccountDetails(String accountNumber, String username);
+
+	AccountResponse unlockAccount(String accountNumber, String username);
+
+	AccountResponse lockAccount(String accountNumber, String username);
 }

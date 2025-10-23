@@ -12,9 +12,11 @@ import com.example.demo.dtos.response.WithdrawalResponse;
 import com.example.demo.service.WithdrawalService;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @RestController
 @RequestMapping("/api/withdrawal")
+@Slf4j
 @RequiredArgsConstructor
 public class WithdrawalController {
 	public final WithdrawalService withdrawalService;

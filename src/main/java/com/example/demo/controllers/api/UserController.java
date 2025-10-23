@@ -24,9 +24,11 @@ import com.example.demo.service.UserService;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @RestController
 @RequestMapping("/api/users")
+@Slf4j
 @RequiredArgsConstructor
 public class UserController {
 	private final UserService userService;
@@ -45,10 +47,8 @@ public class UserController {
 	}
 
 	@PutMapping("/{userId}/role")
-	public ResponseEntity<UserResponse> changeUserRole(
-			@PathVariable("userId") Long userId,
-			@NotBlank(message = "Role code required")
-			@RequestParam String roleCode) {
+	public ResponseEntity<UserResponse> changeUserRole(@PathVariable("userId") Long userId,
+			@NotBlank(message = "Role code required") @RequestParam String roleCode) {
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 		String currentUsername = auth.getName();
 		UserResponse response = userService.changeUserRole(userId, currentUsername, roleCode);

@@ -1,5 +1,6 @@
 package com.example.demo.repositories;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 
@@ -32,4 +33,6 @@ public interface AccountRepository extends JpaRepository<Accounts, Long> {
 	@Query("SELECT a FROM Accounts a WHERE a.users.username = :username")
 	List<Accounts> findByUsers_Username(@Param("username") String username);
 
+	@Query("SELECT COALESCE(SUM(a.balance) , 0) FROM Accounts a")
+	BigDecimal getTotalBalance();
 }

@@ -12,6 +12,7 @@ import com.example.demo.entities.AccountStatuses;
 import com.example.demo.entities.AccountTypes;
 import com.example.demo.entities.Accounts;
 import com.example.demo.entities.Users;
+import com.example.demo.exception.AccountNotFoundException;
 import com.example.demo.exception.BusinessException;
 import com.example.demo.exception.ErrorCodes;
 import com.example.demo.repositories.AccountRepository;
@@ -83,7 +84,7 @@ public class AccountServiceImpl implements AccountService {
 		Users user = userRepository.findByUsername(username)
 				.orElseThrow(() -> new BusinessException(ErrorCodes.USR_NOT_FOUND, "User not found"));
 		Accounts account = accountRepository.findByAccountNumber(accountNumber)
-				.orElseThrow(() -> new BusinessException(ErrorCodes.ACC_NOT_FOUND, "Account not found"));
+				.orElseThrow(() -> new AccountNotFoundException("Account not found"));
 
 		if (!account.getUsers().getId().equals(user.getId())) {
 			throw new BusinessException(ErrorCodes.ACC_ACCESS_DENIED, "Access Denied");
@@ -131,7 +132,7 @@ public class AccountServiceImpl implements AccountService {
 		Users user = userRepository.findByUsername(username)
 				.orElseThrow(() -> new BusinessException(ErrorCodes.USR_NOT_FOUND, "User not found"));
 		Accounts account = accountRepository.findByAccountNumber(accountNumber)
-				.orElseThrow(() -> new BusinessException(ErrorCodes.ACC_NOT_FOUND, "Account not found"));
+				.orElseThrow(() -> new AccountNotFoundException("Account not found"));
 
 		if (!account.getUsers().getId().equals(user.getId())) {
 			throw new BusinessException(ErrorCodes.AUTH_ACCESS_DENIED, "Cannot unlock another user's account");
@@ -153,8 +154,7 @@ public class AccountServiceImpl implements AccountService {
 				.orElseThrow(() -> new BusinessException(ErrorCodes.USR_NOT_FOUND, "User not found"));
 
 		Accounts account = accountRepository.findByAccountNumber(accountNumber)
-				.orElseThrow(() -> new BusinessException(ErrorCodes.ACC_NOT_FOUND, "Account not found"));
-
+				.orElseThrow(() -> new AccountNotFoundException("Account not found"));
 		if (!account.getUsers().getId().equals(user.getId())) {
 			throw new BusinessException(ErrorCodes.ACC_ACCESS_DENIED, "Cannot lock another user's account");
 		}

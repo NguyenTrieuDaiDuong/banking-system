@@ -16,7 +16,7 @@ public class ErrorCodes {
 	public static final String ACC_ALREADY_EXISTS = "BA_ACC_004";
 	public static final String ACC_INVALID_TYPE = "BA_ACC_005";
 	public static final String ACC_UNAUTHORIZED = "BA_ACC_006";
-
+	public static final String ACCOUNT_NOT_ACTIVE = "BA_ACC_003";
 	// ===== TRANSACTION MODULE =====
 	public static final String TXN_NOT_FOUND = "BA_TXN_001";
 	public static final String TXN_ACCESS_DENIED = "BA_TXN_002";
@@ -46,7 +46,10 @@ public class ErrorCodes {
 	// ===== DEPOSIT ERRORS =====
 	public static final String DEPOSIT_LIMIT_EXCEEDED = "BA_DPT_001";
 	public static final String INVALID_PAYMENT_METHOD = "BA_DPT_002";
-	public static final String ACCOUNT_NOT_ACTIVE = "BA_DPT_003";
+
+	// ===== WITHDRAWAL ERRORS =====
+	public static final String WITHDRAWAL_LIMIT_EXCEED = "BA_WDL_001";
+	public static final String INVALID_WITHDRAWAL_METHOD = "BA_WDL_002";
 
 	// ===== BUSINESS RULE ERRORS =====
 	public static final String BUSINESS_RULE_VIOLATION = "BA_BUS_001";

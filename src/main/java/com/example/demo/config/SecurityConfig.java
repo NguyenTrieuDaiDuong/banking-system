@@ -44,15 +44,22 @@ public class SecurityConfig {
 		return http.cors(cors -> cors.configurationSource(corsConfigurationSource())).csrf(csrf -> csrf.disable())
 				.authorizeHttpRequests(auth -> auth
 						// PUBLIC ENDPOINTS
-						.requestMatchers("/api/auth/**", "/api/auth/check-username/**", "/api/auth/check-email/**",
-								"/error", "/swagger-ui/**", "/v3/api-docs/**")
+						.requestMatchers(
+								"/api/auth/**",
+								"/api/auth/check-username/**",
+								"/api/auth/check-email/**",
+								"/error",
+								"/swagger-ui/**",
+								"/v3/api-docs/**")
 						.permitAll()
 						// USER ENDPOINTS
-						.requestMatchers("/api/users").permitAll().requestMatchers("/api/transactions/**")
-						.authenticated().requestMatchers("/api/accounts/**", "/api/transfers/**").authenticated()
+						.requestMatchers("/api/transactions/**").authenticated()
+						.requestMatchers("/api/accounts/**", "/api/transfers/**").authenticated()
+						.requestMatchers("/api/withdrawal/**").authenticated()
 						.requestMatchers("/api/deposits/**").authenticated()
 						// ADMIN ONLY
-						.requestMatchers("/api/users/{id}/role").hasRole("ADMIN").anyRequest().authenticated())
+						.requestMatchers("/api/admin/**").hasRole("ADMIN").anyRequest()
+						.authenticated())
 				.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 				.addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class).build();
 	}

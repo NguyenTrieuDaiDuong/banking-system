@@ -1,5 +1,6 @@
 package com.example.demo.repositories;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -43,5 +44,11 @@ public interface TransactionRepository extends JpaRepository<Transactions, Long>
 
 	@Query("SELECT t FROM Transactions t WHERE t.accountsByFromAccountId.users.username = :username OR t.accountsByToAccountId.users.username =:username ORDER BY t.createdAt DESC")
 	List<Transactions> findByUserUsername(@Param("username") String username);
+
+	@Query("SELECT COALESCE(SUM(t.amount) , 0) FROM Transactions t WHERE t.transactionStatuses.statusCode = 'COMPLETED'")
+	BigDecimal getTotalRevenue();
+
+	@Query("SELECT COUNT(t) FROM Transactions t WHERE DATE(t.createdAt) = CURRENT_DATE")
+	Long getTodayTransactionCount();
 
 }

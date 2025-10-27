@@ -1,6 +1,5 @@
 package com.example.demo.controllers.api;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -8,27 +7,25 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.example.demo.dtos.request.TransferRequest;
-import com.example.demo.dtos.response.TransferResponse;
-import com.example.demo.service.TransferService;
+import com.example.demo.dtos.request.WithdrawalRequest;
+import com.example.demo.dtos.response.WithdrawalResponse;
+import com.example.demo.service.WithdrawalService;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @RestController
-@RequestMapping("/api/transfers")
+@RequestMapping("/api/withdrawal")
 @Slf4j
 @RequiredArgsConstructor
-public class TransferController {
+public class WithdrawalController {
+	public final WithdrawalService withdrawalService;
 
-	@Autowired
-	private TransferService transferService;
-
-	@PostMapping("/internal")
-	public ResponseEntity<?> internalTransfer(@RequestBody TransferRequest request, Authentication authentication) {
+	@PostMapping
+	public ResponseEntity<?> withdrawal(@RequestBody WithdrawalRequest request, Authentication authentication) {
 		try {
 			String username = authentication.getName();
-			TransferResponse response = transferService.transfer(request, username);
+			WithdrawalResponse response = withdrawalService.withdrawal(request, username);
 			return ResponseEntity.ok(response);
 		} catch (Exception e) {
 			return ResponseEntity.badRequest().body(e.getMessage());
@@ -36,10 +33,10 @@ public class TransferController {
 	}
 
 	@PostMapping("/validate")
-	public ResponseEntity<?> validateTransfer(@RequestBody TransferRequest request, Authentication authentication) {
+	public ResponseEntity<?> validateWithdrawal(@RequestBody WithdrawalRequest request, Authentication authentication) {
 		try {
 			String username = authentication.getName();
-			boolean isValid = transferService.validateTransfer(request, username);
+			boolean isValid = withdrawalService.validateWithdrawal(request, username);
 			return ResponseEntity.ok(isValid);
 		} catch (Exception e) {
 			// TODO: handle exception

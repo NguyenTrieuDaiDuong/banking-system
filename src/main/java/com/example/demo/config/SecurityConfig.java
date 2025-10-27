@@ -58,7 +58,7 @@ public class SecurityConfig {
 						.requestMatchers("/api/withdrawal/**").authenticated()
 						.requestMatchers("/api/deposits/**").authenticated()
 						// ADMIN ONLY
-						.requestMatchers("/api/users/**", "/api/admin/**").hasRole("ADMIN").anyRequest()
+						.requestMatchers("/api/admin/**").hasRole("ADMIN").anyRequest()
 						.authenticated())
 				.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 				.addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class).build();

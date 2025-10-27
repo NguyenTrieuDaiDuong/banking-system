@@ -13,7 +13,9 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.example.demo.dtos.request.UserProfileRequest;
 import com.example.demo.dtos.request.UserRequest;
+import com.example.demo.dtos.response.UserProfileResponse;
 import com.example.demo.dtos.response.UserResponse;
 import com.example.demo.entities.UserRoles;
 import com.example.demo.entities.Users;
@@ -110,6 +112,53 @@ public class UserServiceImpl implements UserService {
 		return userPage.map(this::mapToUserResponse);
 	}
 
+	@Override
+	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+		Users user = userRepository.findByUsername(username)
+				.orElseThrow(() -> new UsernameNotFoundException("User not found :" + username));
+
+		List<GrantedAuthority> authorities = List
+				.of(new SimpleGrantedAuthority("ROLE_" + user.getUserRoles().getRoleCode()));
+
+		return new User(user.getUsername(), user.getPassword(), true, true, true, true, authorities);
+	}
+
+	@Override
+	public UserProfileResponse getCurrentUserProfile(String username) {
+		Users user = userRepository.findByUsername(username)
+				.orElseThrow(() -> new BusinessException(ErrorCodes.USR_NOT_FOUND, "Username not found"));
+		return mapToProfileResponse(user);
+	}
+
+	@Override
+	public UserProfileResponse updateUserProfile(String currentUsername, UserProfileRequest request) {
+		Users user = userRepository.findByUsername(currentUsername)
+				.orElseThrow(() -> new BusinessException(ErrorCodes.USR_NOT_FOUND, "Username not found"));
+		if (request.getEmail() != null && !request.getEmail().equals(user.getEmail())) {
+			String newEmail = request.getEmail().trim().toLowerCase();
+			if (!isValidEmail(newEmail)) {
+				throw new BusinessException(ErrorCodes.USR_INVALID_DATA, "INVALID_EMAIL_FORMAT");
+			}
+			if (userRepository.existsByEmail(newEmail)) {
+				throw new BusinessException(ErrorCodes.USR_INVALID_DATA, "EMAIL_ALREADY_EXISTS");
+			}
+			user.setEmail(newEmail);
+		}
+		if (request.getFullName() != null && !request.getFullName().trim().isEmpty()) {
+			user.setFullName(request.getFullName().trim());
+		}
+		if (request.getPhone() != null && !request.getPhone().trim().isEmpty()) {
+			user.setPhone(request.getPhone().trim());
+		}
+		if (request.getAddress() != null) {
+			user.setAddress(request.getAddress().trim());
+		}
+		Users updateUser = userRepository.save(user);
+		return mapToProfileResponse(updateUser);
+	}
+
+	// MAPPING
+
 	private UserResponse mapToUserResponse(Users user) {
 		UserResponse response = new UserResponse();
 
@@ -131,16 +180,19 @@ public class UserServiceImpl implements UserService {
 		return response;
 	}
 
-	@Override
-	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-		Users user = userRepository.findByUsername(username)
-				.orElseThrow(() -> new UsernameNotFoundException("User not found :" + username));
-
-		List<GrantedAuthority> authorities = List
-				.of(new SimpleGrantedAuthority("ROLE_" + user.getUserRoles().getRoleCode()));
-
-		return new User(user.getUsername(), user.getPassword(), true, true, true, true, authorities);
+	private UserProfileResponse mapToProfileResponse(Users user) {
+		UserProfileResponse response = new UserProfileResponse();
+		response.setId(user.getId());
+		response.setUsername(user.getUsername());
+		response.setEmail(user.getEmail());
+		response.setFullName(user.getFullName());
+		response.setPhone(user.getPhone());
+		response.setAddress(user.getAddress());
+		response.setCreatedAt(user.getCreatedAt());
+		return response;
 	}
+
+	// VALIDATION
 
 	private void validateUserRequest(UserRequest request) {
 		if (request.getUsername() == null || request.getUsername().trim().isEmpty()) {
@@ -152,5 +204,10 @@ public class UserServiceImpl implements UserService {
 		if (request.getPassword() == null || request.getPassword().length() < 6) {
 			throw new BusinessException(ErrorCodes.USR_INVALID_DATA, "Password min 6 chars");
 		}
+	}
+
+	private boolean isValidEmail(String email) {
+		String regex = "^[A-Za-z0-9+_.-]+@([A-Za-z0-9.-]+\\.[A-Za-z]{2,})$";
+		return email.matches(regex);
 	}
 }

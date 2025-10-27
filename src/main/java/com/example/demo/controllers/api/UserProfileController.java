@@ -4,12 +4,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.example.demo.dtos.request.ChangePasswordRequest;
 import com.example.demo.dtos.request.UserProfileRequest;
+import com.example.demo.dtos.response.ChangePasswordResponse;
 import com.example.demo.dtos.response.UserProfileResponse;
 import com.example.demo.service.UserService;
 
@@ -43,4 +46,12 @@ public class UserProfileController {
 		}
 	}
 
+	@PatchMapping("/change-password")
+	public ResponseEntity<ChangePasswordResponse> changePassword(Authentication authentication,
+			@Valid @RequestBody ChangePasswordRequest request) {
+
+		String username = authentication.getName();
+		ChangePasswordResponse response = userService.changePassword(username, request);
+		return ResponseEntity.ok(response);
+	}
 }

@@ -13,8 +13,10 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.example.demo.dtos.request.ChangePasswordRequest;
 import com.example.demo.dtos.request.UserProfileRequest;
 import com.example.demo.dtos.request.UserRequest;
+import com.example.demo.dtos.response.ChangePasswordResponse;
 import com.example.demo.dtos.response.UserProfileResponse;
 import com.example.demo.dtos.response.UserResponse;
 import com.example.demo.entities.UserRoles;
@@ -209,5 +211,25 @@ public class UserServiceImpl implements UserService {
 	private boolean isValidEmail(String email) {
 		String regex = "^[A-Za-z0-9+_.-]+@([A-Za-z0-9.-]+\\.[A-Za-z]{2,})$";
 		return email.matches(regex);
+	}
+
+	@Override
+	@Transactional
+	public ChangePasswordResponse changePassword(String username, ChangePasswordRequest request) {
+		Users user = userRepository.findByUsername(username)
+				.orElseThrow(() -> new BusinessException(ErrorCodes.USR_NOT_FOUND, "Username not found"));
+		if (!passwordEncoder.matches(request.getOldPassword(), user.getPassword())) {
+			throw new BusinessException(ErrorCodes.AUTH_INVALID_CREDENTIALS, "OLD_PASSWORD_INCORRECT");
+		}
+		if (passwordEncoder.matches(request.getNewPassword(), user.getPassword())) {
+			throw new BusinessException(ErrorCodes.USR_INVALID_DATA, "NEW_PASSWORD_SAME_AS_OLD");
+
+		}
+		if (!request.getNewPassword().equals(request.getConfirmPassword())) {
+			throw new BusinessException(ErrorCodes.USR_INVALID_DATA, "PASSWORD_CONFIRMATION_DISAPPOINTS");
+		}
+		user.setPassword(passwordEncoder.encode(request.getNewPassword()));
+		userRepository.save(user);
+		return new ChangePasswordResponse("Password changed successfully", System.currentTimeMillis());
 	}
 }

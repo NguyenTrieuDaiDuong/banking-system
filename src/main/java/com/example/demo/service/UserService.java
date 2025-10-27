@@ -6,8 +6,10 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.userdetails.UserDetailsService;
 
+import com.example.demo.dtos.request.ChangePasswordRequest;
 import com.example.demo.dtos.request.UserProfileRequest;
 import com.example.demo.dtos.request.UserRequest;
+import com.example.demo.dtos.response.ChangePasswordResponse;
 import com.example.demo.dtos.response.UserProfileResponse;
 import com.example.demo.dtos.response.UserResponse;
 
@@ -26,4 +28,5 @@ public interface UserService extends UserDetailsService {
 
 	public UserProfileResponse updateUserProfile(String currentUsername, UserProfileRequest request);
 
+	public ChangePasswordResponse changePassword(String username, ChangePasswordRequest request);
 }

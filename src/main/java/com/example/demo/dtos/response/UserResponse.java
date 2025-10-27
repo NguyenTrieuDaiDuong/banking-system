@@ -15,5 +15,4 @@ public class UserResponse {
 	private String roleCode;
 	private String statusName;
 	private LocalDateTime createAt;
-
 }

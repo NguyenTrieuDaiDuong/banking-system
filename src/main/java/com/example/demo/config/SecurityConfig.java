@@ -57,6 +57,7 @@ public class SecurityConfig {
 						.requestMatchers("/api/accounts/**", "/api/transfers/**").authenticated()
 						.requestMatchers("/api/withdrawal/**").authenticated()
 						.requestMatchers("/api/deposits/**").authenticated()
+						.requestMatchers("/api/users/**").authenticated()
 						// ADMIN ONLY
 						.requestMatchers("/api/admin/**").hasRole("ADMIN").anyRequest()
 						.authenticated())

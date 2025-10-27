@@ -13,9 +13,11 @@ import com.example.demo.dtos.response.DepositResponse;
 import com.example.demo.service.DepositService;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @RestController
 @RequestMapping("/api/deposits")
+@Slf4j
 @RequiredArgsConstructor
 public class DepositController {
 

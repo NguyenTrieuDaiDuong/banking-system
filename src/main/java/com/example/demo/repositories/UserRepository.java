@@ -28,4 +28,7 @@ public interface UserRepository extends JpaRepository<Users, Long> {
 
 	@Query("SELECT DISTINCT u FROM Users u JOIN FETCH u.userRoles JOIN FETCH u.userStatuses")
 	List<Users> findAllWithRelations();
+
+	@Query("SELECT COUNT(u) FROM Users u WHERE u.userStatuses.statusCode = 'ACTIVE'")
+	Long countActiveUsers();
 }

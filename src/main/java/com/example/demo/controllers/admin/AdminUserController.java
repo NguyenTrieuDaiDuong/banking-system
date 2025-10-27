@@ -1,4 +1,4 @@
-package com.example.demo.controllers.api;
+package com.example.demo.controllers.admin;
 
 import java.util.List;
 
@@ -6,6 +6,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -24,11 +25,14 @@ import com.example.demo.service.UserService;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @RestController
-@RequestMapping("/api/users")
+@RequestMapping("/api/admin/users")
+@Slf4j
+@PreAuthorize("hasRole('ADMIN')")
 @RequiredArgsConstructor
-public class UserController {
+public class AdminUserController {
 	private final UserService userService;
 
 	@PostMapping("")
@@ -45,10 +49,8 @@ public class UserController {
 	}
 
 	@PutMapping("/{userId}/role")
-	public ResponseEntity<UserResponse> changeUserRole(
-			@PathVariable("userId") Long userId,
-			@NotBlank(message = "Role code required")
-			@RequestParam String roleCode) {
+	public ResponseEntity<UserResponse> changeUserRole(@PathVariable("userId") Long userId,
+			@NotBlank(message = "Role code required") @RequestParam String roleCode) {
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 		String currentUsername = auth.getName();
 		UserResponse response = userService.changeUserRole(userId, currentUsername, roleCode);

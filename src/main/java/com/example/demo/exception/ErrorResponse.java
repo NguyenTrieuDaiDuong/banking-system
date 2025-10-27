@@ -4,17 +4,19 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 import lombok.Data;
 
 @Data
 @JsonInclude(JsonInclude.Include.NON_NULL)
+@JsonPropertyOrder({ "timestamp", "errorCode", "message", "path", "details" })
 public class ErrorResponse {
-	private LocalDateTime timestamp;
 	private String errorCode;
 	private String message;
-	private List<String> details;
 	private String path;
+	private LocalDateTime timestamp;
+	private List<String> details;
 
 	public ErrorResponse(String errorCode, String message) {
 		this.timestamp = LocalDateTime.now();

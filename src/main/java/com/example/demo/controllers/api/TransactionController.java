@@ -14,9 +14,11 @@ import com.example.demo.dtos.response.TransactionHistoryResponse;
 import com.example.demo.service.TransactionService;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @RestController
 @RequestMapping("/api/transactions")
+@Slf4j
 @RequiredArgsConstructor
 public class TransactionController {
 

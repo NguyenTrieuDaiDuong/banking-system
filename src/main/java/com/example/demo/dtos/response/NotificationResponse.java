@@ -5,8 +5,7 @@ import lombok.Data;
 
 @Data
 @AllArgsConstructor
-
-public class ChangePasswordResponse {
+public class NotificationResponse {
 	private String message;
 	private Long timesTamp;
 }

@@ -195,10 +195,10 @@ mvn test
 **Problem:** Cannot connect to database
 - **Solution:** Check MySQL is running and credentials in `application.properties` are correct
 
-**Problem:** Port 8080 already in use
+**Problem:** Port 8088 already in use
 - **Solution:** Change port in `application.properties`:
   ```properties
-  server.port=8081
+  server.port=8088
   ```
 
 **Problem:** Maven dependencies not downloading
